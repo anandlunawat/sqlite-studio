@@ -3,6 +3,7 @@ import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm';
 const log = console.log;
 const error = console.error;
 let promiser: unknown;
+let dbId : any;
 
 export const initializeSQLite = async () => {
   if(!promiser) {
@@ -23,11 +24,13 @@ export const initializeSQLite = async () => {
       const openResponse = await promiser('open', {
         filename: 'file:mydb.sqlite3?vfs=opfs',
       });
-      const { dbId } = openResponse;
+      dbId = openResponse.dbId;
       log(
         'OPFS is available, created persisted database at',
-        openResponse.result.filename.replace(/^file:(.*?)\?vfs=opfs$/, '$1'),
+        openResponse.result.filename.replace(/^file:(.*?)\?vfs=opfs$/, '$1'),openResponse.dbId
       );
+      const tables = await execQuery(`SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%';`);
+      return tables
       // Your SQLite code here.
     } catch (err) {
       if (!(err instanceof Error)) {
@@ -35,5 +38,25 @@ export const initializeSQLite = async () => {
       }
       error(err.name, err.message);
     }
+  }
+};
+
+export const execQuery = async (sql: string) => {
+  if (!promiser || !dbId) {
+    throw new Error("SQLite is not initialized yet.");
+  }
+
+  try {
+    const result = await promiser("exec", {
+      dbId,
+      sql,
+      returnValue: "resultRows",
+      rowMode: "object",
+    });
+    log("Resu;t after executing a query",sql,":",result)
+    return result;
+  } catch (err: any) {
+    console.log(err)
+    return err;
   }
 };
