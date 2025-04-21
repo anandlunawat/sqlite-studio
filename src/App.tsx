@@ -54,7 +54,7 @@ function App() {
 
   return (
     <div className="p-2 md:flex-row md:flex flex-col flex gap-2">
-      <div className="basis-9/12">
+      <div className="basis-9/12 border-[2px] border-[#e3ebfa] rounded-lg p-2">
         <SqlTerminal onQueryExecuted={onQueryExecuted }/>
       </div>
       <div className="basis-3/12">
