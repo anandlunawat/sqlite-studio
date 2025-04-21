@@ -18,7 +18,7 @@ export default function TableComponent({ result }: { result: any }) {
                 </tr>
             </thead>
             <tbody>
-                {result.map((row: any, rowIndex) => (
+                {result.map((row: any, rowIndex: any) => (
                     <tr key={rowIndex} className="hover:bg-gray-50">
                         {headers.map((header) => (
                             <td key={header} className="text-[#25265E] border p-2 font-euclidCircular font-normal text-xs">

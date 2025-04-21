@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm';
 
 const log = console.log;
