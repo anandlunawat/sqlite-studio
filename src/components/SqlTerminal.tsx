@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 import { execQuery } from "../workers/sqliteWorker";
 import TableComponent from "./TableComponent";
 
-export default function SqlTerminal() {
+export default function SqlTerminal({onQueryExecuted}: {onQueryExecuted : ()=> void }) {
   const [input, setInput] = useState("");
   const editableRef = useRef<HTMLDivElement>(null);
   const [queryResult, setQueryResult] = useState<{
@@ -70,10 +70,10 @@ export default function SqlTerminal() {
         spellCheck={false}
       />
       <div>
-        <span className="font-euclidCircular text-xs">Output</span>
+        <span className="font-euclidCircular text-xs">Output: </span>
         {
           (queryResult.resultType) && 
-            (queryResult.resultType === 'error' ? <span>{queryResult.errorResult}</span> :  <TableComponent result={queryResult.result}/>)
+            (queryResult.resultType === 'error' ? <span className="font-euclidCircular font-normal text-xs text-red-600">{queryResult.errorResult}</span> :  <TableComponent result={queryResult.result}/>)
         }
       </div>
     </div>

@@ -29,8 +29,7 @@ export const initializeSQLite = async () => {
         'OPFS is available, created persisted database at',
         openResponse.result.filename.replace(/^file:(.*?)\?vfs=opfs$/, '$1'),openResponse.dbId
       );
-      const tables = await execQuery(`SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%';`);
-      return tables
+      return dbId;
       // Your SQLite code here.
     } catch (err) {
       if (!(err instanceof Error)) {

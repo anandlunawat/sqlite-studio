@@ -14,41 +14,48 @@ function App() {
 
   async function initDbTables() {
     const results = await initializeSQLite();
-    if (results?.type === 'exec') {
-      setTable(results)
+    if(results) {
+      onQueryExecuted()
     }
   }
 
-  async function setTable(results: any) {
-    const tables = results.result?.resultRows;
-      const allResults: any[] = []; // Temporary array to hold all table results
-
-      for (const table of tables) {
-        try {
-          const query = `SELECT * FROM ${table.name}`;
-          const queryResults = await execQuery(query);
-          
-          // Handle results
-          if (queryResults.type === 'exec') {
-            allResults.push({
-              tableName: table.name,
-              data: queryResults.result.resultRows,
-            });
-          } else {
-            console.error(`Error in table ${table.name}:`, queryResults.result.stack[0]);
+  async function setTable() {
+    const results = await execQuery(`SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%';`);
+    if (results?.type === 'exec') {
+      const tables = results.result?.resultRows;
+        const allResults: any[] = []; // Temporary array to hold all table results
+  
+        for (const table of tables) {
+          try {
+            const query = `SELECT * FROM ${table.name}`;
+            const queryResults = await execQuery(query);
+            
+            // Handle results
+            if (queryResults.type === 'exec') {
+              allResults.push({
+                tableName: table.name,
+                data: queryResults.result.resultRows,
+              });
+            } else {
+              console.error(`Error in table ${table.name}:`, queryResults.result.stack[0]);
+            }
+          } catch (error) {
+            console.error('Error executing query', error);
           }
-        } catch (error) {
-          console.error('Error executing query', error);
         }
-      }
+  
+        setResultsArray(allResults);
+    }
+  }
 
-      setResultsArray(allResults);
+  function onQueryExecuted() {
+    setTable()
   }
 
   return (
-    <div className="p-2 max-md:flex-col flex gap-2">
+    <div className="p-2 md:flex-row md:flex flex-col flex gap-2">
       <div className="basis-9/12">
-        <SqlTerminal />
+        <SqlTerminal onQueryExecuted={onQueryExecuted }/>
       </div>
       <div className="basis-3/12">
         {/* Render TableComponent for each table result */}

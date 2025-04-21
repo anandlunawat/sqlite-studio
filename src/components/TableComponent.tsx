@@ -11,7 +11,7 @@ export default function TableComponent({ result }: { result: any }) {
                     {
                         headers.map((header, index) => {
                             return (
-                                <th key={index} className="text-[#25265E] p-2 font-medium text-sm border">{header}</th>
+                                <th key={index} className="text-[#25265E] p-2 font-normal text-xs border">{header}</th>
                             )
                         })
                     }
@@ -21,7 +21,7 @@ export default function TableComponent({ result }: { result: any }) {
                 {result.map((row: any, rowIndex) => (
                     <tr key={rowIndex} className="hover:bg-gray-50">
                         {headers.map((header) => (
-                            <td key={header} className="text-[#25265E] border p-2 font-euclidCircular font-medium text-sm">
+                            <td key={header} className="text-[#25265E] border p-2 font-euclidCircular font-normal text-xs">
                                 {String(row[header])}
                             </td>
                         ))}
