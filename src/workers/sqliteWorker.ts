@@ -23,9 +23,15 @@ export const initializeSQLite = async () => {
       const configResponse = await promiser('config-get', {});
       log('Running SQLite3 version', configResponse.result.version.libVersion);
   
-      const openResponse = await promiser('open', {
-        filename: 'file:mydb.sqlite3?vfs=opfs',
-      });
+      const supportsOPFS = typeof navigator.storage?.getDirectory === "function";
+
+const filename = supportsOPFS
+  ? 'file:mydb.sqlite3?vfs=opfs'
+  : 'mydb.sqlite3'; // fallback (uses default VFS, not persisted)
+
+const openResponse = await promiser('open', {
+  filename,
+});
       dbId = openResponse.dbId;
       log(
         'OPFS is available, created persisted database at',
