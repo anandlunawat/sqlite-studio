@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm/dist/bundler-friendly.mjs';
+import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm';
 
 const log = console.log;
 const error = console.error;
