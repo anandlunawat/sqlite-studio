@@ -1,41 +1,41 @@
 // @ts-nocheck
 
-import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm';
+import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm/dist/bundler-friendly.mjs';
 
 const log = console.log;
 const error = console.error;
 let promiser: unknown;
-let dbId : any;
+let dbId: any;
 
 export const initializeSQLite = async () => {
-  if(!promiser) {
+  if (!promiser) {
     try {
       log('Loading and initializing SQLite3 module...');
-  
+
       promiser = await new Promise((resolve) => {
         const _promiser = sqlite3Worker1Promiser({
           onready: () => resolve(_promiser),
         });
       });
-  
+
       log('Done initializing. Running demo...');
-  
+
       const configResponse = await promiser('config-get', {});
-      log('Running SQLite3 version', configResponse.result.version.libVersion);
-  
+      log('Running SQLite3 version', configResponse);
+
       const supportsOPFS = typeof navigator.storage?.getDirectory === "function";
 
-const filename = supportsOPFS
-  ? 'file:mydb.sqlite3?vfs=opfs'
-  : 'mydb.sqlite3'; // fallback (uses default VFS, not persisted)
+      const filename = supportsOPFS
+        ? 'file:mydb.sqlite3?vfs=opfs'
+        : 'mydb.sqlite3'; // fallback (uses default VFS, not persisted)
 
-const openResponse = await promiser('open', {
-  filename,
-});
+      const openResponse = await promiser('open', {
+        filename,
+      });
       dbId = openResponse.dbId;
       log(
         'OPFS is available, created persisted database at',
-        openResponse.result.filename.replace(/^file:(.*?)\?vfs=opfs$/, '$1'),openResponse.dbId
+        openResponse.result.filename.replace(/^file:(.*?)\?vfs=opfs$/, '$1'), openResponse.dbId
       );
       return dbId;
       // Your SQLite code here.
@@ -60,7 +60,7 @@ export const execQuery = async (sql: string) => {
       returnValue: "resultRows",
       rowMode: "object",
     });
-    log("Resu;t after executing a query",sql,":",result)
+    log("Resu;t after executing a query", sql, ":", result)
     return result;
   } catch (err: any) {
     console.log(err)
