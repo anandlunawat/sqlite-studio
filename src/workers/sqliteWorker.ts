@@ -42,9 +42,10 @@ export const initializeSQLite = async () => {
 
       log('OPFS support detected:', supportsOPFS);
 
-      const filename = supportsOPFS
-        ? 'file:mydb.sqlite3?vfs=opfs'
-        : 'mydb.sqlite3'; // fallback (uses default VFS, not persisted)
+      const filename = 'mydb.sqlite3';
+        //supportsOPFS
+        //? 'file:mydb.sqlite3?vfs=opfs'
+        //: 'mydb.sqlite3'; // fallback (uses default VFS, not persisted)
 
       const openResponse = await promiser('open', {
         filename,
@@ -75,7 +76,6 @@ export const initializeSQLite = async () => {
 export const execQuery = async (sql: string) => {
   if (!promiser || !dbId) {
     throw new Error("SQLite is not initialized yet.");
-    initializeSQLite()
   }
 
   try {
