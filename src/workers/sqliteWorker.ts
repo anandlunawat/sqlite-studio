@@ -23,7 +23,24 @@ export const initializeSQLite = async () => {
       const configResponse = await promiser('config-get', {});
       log('Running SQLite3 version', configResponse);
 
-      const supportsOPFS = typeof navigator.storage?.getDirectory === "function";
+      // Check if OPFS is supported
+      let supportsOPFS = false;
+      try {
+        supportsOPFS = (
+          typeof navigator.storage?.getDirectory === "function" && 
+          window.isSecureContext === true
+        );
+        
+        // Additional verification - try to actually access OPFS
+        if (supportsOPFS) {
+          await navigator.storage.getDirectory();
+        }
+      } catch (e) {
+        log('OPFS access failed:', e);
+        supportsOPFS = false;
+      }
+
+      log('OPFS support detected:', supportsOPFS);
 
       const filename = supportsOPFS
         ? 'file:mydb.sqlite3?vfs=opfs'
@@ -33,24 +50,32 @@ export const initializeSQLite = async () => {
         filename,
       });
       dbId = openResponse.dbId;
+      
       log(
-        'OPFS is available, created persisted database at',
-        openResponse.result.filename.replace(/^file:(.*?)\?vfs=opfs$/, '$1'), openResponse.dbId
+        supportsOPFS 
+          ? 'Created persisted database with OPFS at' 
+          : 'Created in-memory database at',
+        openResponse.result.filename,
+        'dbId:', openResponse.dbId
       );
+      
       return dbId;
-      // Your SQLite code here.
     } catch (err) {
       if (!(err instanceof Error)) {
-        err = new Error(err.result.message);
+        err = new Error(err.result?.message || String(err));
       }
       error(err.name, err.message);
+      throw err; // Re-throw to allow caller to handle the error
     }
   }
+  
+  return dbId;
 };
 
 export const execQuery = async (sql: string) => {
   if (!promiser || !dbId) {
     throw new Error("SQLite is not initialized yet.");
+    initializeSQLite()
   }
 
   try {
