@@ -1,10 +1,12 @@
 import React, { useRef, useState } from "react";
 // import Prism from "prismjs";
-import { execQuery } from "../workers/sqliteWorker";
+// import { execQuery } from "../workers/sqliteWorker";
 import TableComponent from "./TableComponent";
+import { useSQLite } from "../hooks/useSQLite";
 
 export default function SqlTerminal({onQueryExecuted}: {onQueryExecuted : ()=> void }) {
   const [input, setInput] = useState("");
+  const { isReady, error, isPersisted, execQuery } = useSQLite();
   const editableRef = useRef<HTMLDivElement>(null);
   const [queryResult, setQueryResult] = useState<{
     resultType: 'exec' | 'error' | null;
@@ -28,8 +30,11 @@ export default function SqlTerminal({onQueryExecuted}: {onQueryExecuted : ()=> v
   };
 
   const executeQuery = async () => {
+   if(isReady) {
     onQueryExecuted()
     const results = await execQuery(input);
+    console.log("Error",error)
+    console.log("Is Persisted",isPersisted)
     const resultType = results.type; // 'exec' or 'error'
   
     if (resultType === 'error') {
@@ -49,6 +54,7 @@ export default function SqlTerminal({onQueryExecuted}: {onQueryExecuted : ()=> v
         errorResult: null,
       });
     }
+   }
   };
   
 
