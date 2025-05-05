@@ -2,11 +2,18 @@ import React, { useRef, useState } from "react";
 // import Prism from "prismjs";
 // import { execQuery } from "../workers/sqliteWorker";
 import TableComponent from "./TableComponent";
-import { useSQLite } from "../hooks/useSQLite";
 
-export default function SqlTerminal({onQueryExecuted}: {onQueryExecuted : ()=> void }) {
+interface SQLiteHook {
+  isReady: boolean;
+  error: string | null;
+  isPersisted: boolean;
+  execQuery: (sql: string) => Promise<any>;
+  closeDatabase: () => Promise<void>;
+}
+
+export default function SqlTerminal({sqliteHook,onQueryExecuted}: {sqliteHook: SQLiteHook,onQueryExecuted : ()=> void }) {
+  console.log("In SqlTerminal")
   const [input, setInput] = useState("");
-  const { isReady, error, isPersisted, execQuery } = useSQLite();
   const editableRef = useRef<HTMLDivElement>(null);
   const [queryResult, setQueryResult] = useState<{
     resultType: 'exec' | 'error' | null;
@@ -30,28 +37,22 @@ export default function SqlTerminal({onQueryExecuted}: {onQueryExecuted : ()=> v
   };
 
   const executeQuery = async () => {
-   if(isReady) {
-    onQueryExecuted()
-    const results = await execQuery(input);
-    console.log("Error",error)
-    console.log("Is Persisted",isPersisted)
+   if(sqliteHook.isReady) {
+    const results = await sqliteHook.execQuery(input);
     const resultType = results.type; // 'exec' or 'error'
   
-    if (resultType === 'error') {
-      const errorMessage = results.result?.stack?.[0] || "Unknown error";
-      console.error("Query Error", errorMessage);
-  
-      setQueryResult({
-        resultType: 'error',
-        result: null,
-        errorResult: errorMessage,
-      });
-    } else {
+    if (resultType && resultType === 'exec') {
       console.log("Query Results", results.result?.resultRows || []);
       setQueryResult({
         resultType: 'exec',
         result: results.result?.resultRows || [],
         errorResult: null,
+      });
+    } else {
+      setQueryResult({
+        resultType: 'error',
+        result: null,
+        errorResult: results,
       });
     }
    }
@@ -78,8 +79,7 @@ export default function SqlTerminal({onQueryExecuted}: {onQueryExecuted : ()=> v
       <div>
         <span className="font-euclidCircular text-xs">Output: </span>
         {
-          (queryResult.resultType) && 
-            (queryResult.resultType === 'error' ? <span className="font-euclidCircular font-normal text-xs text-red-600">{queryResult.errorResult}</span> :  <TableComponent result={queryResult.result}/>)
+          (sqliteHook.error ? <span className="font-euclidCircular font-normal text-xs text-red-600">{sqliteHook.error}</span> :  <TableComponent result={queryResult.result}/>)
         }
       </div>
     </div>

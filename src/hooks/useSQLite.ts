@@ -43,6 +43,7 @@ export function useSQLite(): SQLiteHook {
           
         case 'execResult':
           // Resolve the pending promise for the exec operation
+          setError(null)
           const execCallback = callbacksRef.current.get('exec');
           if (execCallback) {
             execCallback.resolve(payload.result);
@@ -63,7 +64,7 @@ export function useSQLite(): SQLiteHook {
           // Reject any pending promises
           const errorCallback = callbacksRef.current.get(payload.operation);
           if (errorCallback) {
-            errorCallback.reject(new Error(payload.message));
+            errorCallback.resolve(new Error(payload.message));
             callbacksRef.current.delete(payload.operation);
           }
           break;

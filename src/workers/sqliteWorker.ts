@@ -99,7 +99,7 @@ const promiser1 = new Promise((resolve)=>{
         self.postMessage({
           type: 'error',
           payload: { 
-            message: err instanceof Error ? err.message : String(err),
+            message: err.result.message,
             operation: type
           }
         });
