@@ -48,6 +48,7 @@ export default function SqlTerminal({sqliteHook,onQueryExecuted}: {sqliteHook: S
         result: results.result?.resultRows || [],
         errorResult: null,
       });
+      onQueryExecuted()
     } else {
       setQueryResult({
         resultType: 'error',
