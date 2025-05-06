@@ -17,7 +17,9 @@ function App() {
   }, [sqliteHook.isReady]);
 
   async function setTable() {
+    console.log("In SetTable()")
     const results = await sqliteHook.execQuery(`SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%';`);
+    console.log("In SetTable() results",results)
     if (results?.type === 'exec') {
       const tables = results.result?.resultRows;
         const allResults: any[] = []; // Temporary array to hold all table results
