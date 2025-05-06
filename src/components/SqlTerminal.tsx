@@ -64,7 +64,7 @@ export default function SqlTerminal({sqliteHook,onQueryExecuted}: {sqliteHook: S
     <div className="flex flex-col bg-[#fafbfc]">
       <div className="flex w-full">
         <span className="bg-[#d4d3d370] w-fit p-2 text-xs font-euclidCircular">Input</span>
-        <button className="ml-auto font-arial text-[14px] font-bold" onClick={executeQuery}>Run SQL</button>
+        <button className="ml-auto font-arial bg-[#0554f2] p-2 rounded-md mb-2 text-white text-[14px] font-bold" onClick={executeQuery}>Run SQL</button>
       </div>
       <div
         ref={editableRef}
